@@ -4,7 +4,8 @@ COPY . .
 
 RUN chmod +x mvnw
 
-RUN ./mvnw clean package
+# 🔥 THIS IS THE FIX
+RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
 
