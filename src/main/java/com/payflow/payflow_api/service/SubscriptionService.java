@@ -36,9 +36,9 @@ public class SubscriptionService {
         Subscription subscription=new Subscription();
         subscription.setBillingMode(dto.billingMode());
         subscription.setCustomerId(dto.customerId());
-        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setStatus(SubscriptionStatus.ACTIVE); // not from DTO
         subscription.setPlanId(dto.planId());
-        subscription.setStartDate(LocalDate.now());
+        subscription.setStartDate(LocalDate.now()); // not from DTO
 
         Plan plan = planRepository.findById(dto.planId()).orElseThrow(()->new RuntimeException("Plan Not Found"));
 

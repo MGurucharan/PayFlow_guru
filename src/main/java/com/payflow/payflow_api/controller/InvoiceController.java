@@ -24,12 +24,6 @@ public class InvoiceController {
         this.invoiceService=invoiceService;
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public InvoiceDTO createInvoice(@Valid @RequestBody CreateInvoiceDTO dto)
-    {
-        return invoiceService.createInvoice(dto);
-    }
 
     @GetMapping
     public List<InvoiceDTO> getInvoices()

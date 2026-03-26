@@ -5,8 +5,10 @@ import com.payflow.payflow_api.dto.CustomerDTO;
 import com.payflow.payflow_api.dto.InvoiceDTO;
 import com.payflow.payflow_api.entity.Customer;
 import com.payflow.payflow_api.entity.Invoice;
+import com.payflow.payflow_api.entity.Subscription;
 import com.payflow.payflow_api.enums.InvoiceStatus;
 import com.payflow.payflow_api.repository.InvoiceRepository;
+import com.payflow.payflow_api.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,25 +19,27 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
-    public InvoiceService(InvoiceRepository invoiceRepository)
+    public InvoiceService(InvoiceRepository invoiceRepository, SubscriptionRepository subscriptionRepository)
     {
         this.invoiceRepository=invoiceRepository;
+        this.subscriptionRepository=subscriptionRepository;
     }
 
     // Create an Invoice
 
-    public InvoiceDTO createInvoice(CreateInvoiceDTO dto)
+    public InvoiceDTO createInvoice(CreateInvoiceDTO dto,InvoiceStatus status)
     {
         Invoice invoice=new Invoice();
         invoice.setAmount(dto.amount());
         invoice.setSubscriptionId(dto.subscriptionId());
         invoice.setIssueDate(LocalDate.now());
         invoice.setDueDate(LocalDate.now().plusDays(15));
-        invoice.setStatus(InvoiceStatus.PENDING);
-        Invoice savedInvoice = invoiceRepository.save(invoice);
+        invoice.setStatus(status);
 
-        return convertToDTO(savedInvoice);
+        Invoice sinvoice=invoiceRepository.save(invoice);
+        return convertToDTO(sinvoice);
     }
 
     public List<InvoiceDTO> getInvoices()
