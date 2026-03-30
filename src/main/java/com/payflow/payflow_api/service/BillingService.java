@@ -1,4 +1,5 @@
 package com.payflow.payflow_api.service;
+import java.util.Random;
 
 import com.payflow.payflow_api.dto.CreateInvoiceDTO;
 import com.payflow.payflow_api.dto.InvoiceDTO;
@@ -29,12 +30,19 @@ public class BillingService {
         Plan plan=planRepository.findById(subscription.getPlanId()).orElseThrow(()->new RuntimeException("Plan not found"));
 
         InvoiceStatus status;
+        Random random = new Random();
         if(subscription.getBillingMode().equals("Auto"))
         {
-            // Perform the Payment
-            // If payment successful then mark the status as PAID
-            // Else PENDING
-            status=InvoiceStatus.PAID;
+            //Simulating the PAYMENT
+            double perc=random.nextDouble(); // 0.54 , 0.23434
+            if((perc*100)>=70)
+            {
+                status=InvoiceStatus.PAID;
+            }
+            else
+            {
+                status=InvoiceStatus.FAILED;
+            }
         }
         else
         {
