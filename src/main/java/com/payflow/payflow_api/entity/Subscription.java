@@ -1,5 +1,6 @@
 package com.payflow.payflow_api.entity;
 
+import com.payflow.payflow_api.enums.BillingMode;
 import com.payflow.payflow_api.enums.SubscriptionStatus;
 import jakarta.persistence.*;
 
@@ -14,10 +15,30 @@ public class Subscription {
 
     private Long customerId;
 
+    private Integer retryCount;
+
+    private Integer maxRetryCount;
 
     private Long planId;
 
-    private String billingMode; // Auto //Invoice
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(Integer retryCount) {
+        this.retryCount = 0;
+    }
+
+    public Integer getMaxRetryCount() {
+        return maxRetryCount;
+    }
+
+    public void setMaxRetryCount() {
+        this.maxRetryCount = 3;
+    }
+
+    @Enumerated (EnumType.STRING)
+    private BillingMode billingMode;// Auto //Invoice
 
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
@@ -49,11 +70,11 @@ public class Subscription {
         this.planId = planId;
     }
 
-    public String getBillingMode() {
+    public BillingMode getBillingMode() {
         return billingMode;
     }
 
-    public void setBillingMode(String billingMode) {
+    public void setBillingMode(BillingMode billingMode) {
         this.billingMode = billingMode;
     }
 

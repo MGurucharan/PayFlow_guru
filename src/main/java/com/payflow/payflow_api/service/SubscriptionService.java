@@ -34,6 +34,7 @@ public class SubscriptionService {
     public SubscriptionResponseDTO createSubscription(SubscriptionDTO dto)
     {
         Subscription subscription=new Subscription();
+        subscription.setRetryCount(0);
         subscription.setBillingMode(dto.billingMode());
         subscription.setCustomerId(dto.customerId());
         subscription.setStatus(SubscriptionStatus.ACTIVE); // not from DTO
