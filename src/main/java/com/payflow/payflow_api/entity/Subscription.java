@@ -17,7 +17,7 @@ public class Subscription {
 
     private Integer retryCount;
 
-    private Integer maxRetryCount;
+    private int maxRetryCount;
 
     private Long planId;
 
@@ -29,7 +29,7 @@ public class Subscription {
         this.retryCount = 0;
     }
 
-    public Integer getMaxRetryCount() {
+    public int getMaxRetryCount() {
         return maxRetryCount;
     }
 
