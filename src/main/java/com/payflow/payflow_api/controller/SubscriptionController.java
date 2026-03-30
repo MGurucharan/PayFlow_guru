@@ -1,5 +1,6 @@
 package com.payflow.payflow_api.controller;
 
+import com.payflow.payflow_api.dto.InvoiceDTO;
 import com.payflow.payflow_api.dto.PlanDTO;
 import com.payflow.payflow_api.dto.SubscriptionDTO;
 import com.payflow.payflow_api.dto.SubscriptionResponseDTO;
@@ -53,5 +54,11 @@ public class SubscriptionController {
     {
         subscriptionService.deleteSubscription(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/retry")
+    public InvoiceDTO retrySubscription(@PathVariable Long id)
+    {
+        return subscriptionService.retrySubscription(id);
     }
 }

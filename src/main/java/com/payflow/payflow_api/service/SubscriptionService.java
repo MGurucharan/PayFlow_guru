@@ -4,6 +4,7 @@ package com.payflow.payflow_api.service;
 import com.payflow.payflow_api.dto.InvoiceDTO;
 import com.payflow.payflow_api.dto.SubscriptionDTO;
 import com.payflow.payflow_api.dto.SubscriptionResponseDTO;
+import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Plan;
 import com.payflow.payflow_api.entity.Subscription;
 import com.payflow.payflow_api.enums.BillingCycle;
@@ -100,4 +101,19 @@ public class SubscriptionService {
     {
         return new SubscriptionDTO(subscription.getId(), subscription.getCustomerId(),subscription.getPlanId(),subscription.getBillingMode());
     }
+
+    public InvoiceDTO retrySubscription(Long id)
+    {
+        Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()->new RuntimeException("Subscription not found !"));
+        if(subscription.getStatus()!=SubscriptionStatus.PAST_DUE)
+        {
+            return billingservice.processSubscription(subscription);
+        }
+        else
+        {
+            throw new RuntimeException("Subscription Max Retry Count Exceeded !");
+        }
+    }
+
+
 }
