@@ -43,6 +43,16 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
+    private Double perc;
+
+    public Double getPerc() {
+        return perc;
+    }
+
+    public void setPerc(Double perc) {
+        this.perc = perc;
+    }
+
     private LocalDate startDate;
 
     public Long getId() {

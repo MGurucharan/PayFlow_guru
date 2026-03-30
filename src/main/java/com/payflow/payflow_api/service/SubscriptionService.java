@@ -37,6 +37,7 @@ public class SubscriptionService {
         Subscription subscription=new Subscription();
         subscription.setRetryCount(0);
         subscription.setBillingMode(dto.billingMode());
+        subscription.setMaxRetryCount();
         subscription.setCustomerId(dto.customerId());
         subscription.setStatus(SubscriptionStatus.ACTIVE); // not from DTO
         subscription.setPlanId(dto.planId());
@@ -99,7 +100,7 @@ public class SubscriptionService {
 
     public SubscriptionDTO convertToDTO(Subscription subscription)
     {
-        return new SubscriptionDTO(subscription.getId(), subscription.getCustomerId(),subscription.getPlanId(),subscription.getBillingMode());
+        return new SubscriptionDTO(subscription.getId(), subscription.getCustomerId(),subscription.getPlanId(),subscription.getBillingMode(),subscription.getPerc());
     }
 
     public InvoiceDTO retrySubscription(Long id)

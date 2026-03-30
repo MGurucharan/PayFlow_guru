@@ -37,6 +37,7 @@ public class BillingService {
         {
             //Simulating the PAYMENT
             double perc=random.nextDouble(); // 0.54 , 0.23434
+            subscription.setPerc(perc);
             if((perc)>=0.70)
             {
                 status=InvoiceStatus.PAID;
