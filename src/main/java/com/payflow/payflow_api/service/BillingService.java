@@ -26,6 +26,8 @@ public class BillingService {
         this.subscriptionRepository = subscriptionRepository;
     }
 
+
+    // FAILED subscriptions arrive :
     public InvoiceDTO processSubscription(Subscription subscription)
     {
 

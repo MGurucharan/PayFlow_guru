@@ -111,6 +111,7 @@ public class SubscriptionService {
     {
         Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()->new RuntimeException("Subscription not found !"));
 
+        // Possibility 1
         Invoice latest_invoice=invoiceRepository.findTopBySubscriptionIdOrderByIdDesc(id).orElseThrow(()->new RuntimeException("No invoice found for this subscription"));
 
         if(latest_invoice.getStatus()== InvoiceStatus.PAID)
