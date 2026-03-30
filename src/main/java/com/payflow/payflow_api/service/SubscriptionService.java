@@ -8,7 +8,9 @@ import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Plan;
 import com.payflow.payflow_api.entity.Subscription;
 import com.payflow.payflow_api.enums.BillingCycle;
+import com.payflow.payflow_api.enums.InvoiceStatus;
 import com.payflow.payflow_api.enums.SubscriptionStatus;
+import com.payflow.payflow_api.repository.InvoiceRepository;
 import com.payflow.payflow_api.repository.PlanRepository;
 import com.payflow.payflow_api.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
@@ -24,12 +26,14 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final PlanRepository planRepository;
     private final BillingService billingservice;
+    private final InvoiceRepository invoiceRepository;
 
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, PlanRepository planRepository, BillingService billingservice)
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, PlanRepository planRepository, BillingService billingservice, InvoiceRepository invoiceRepository)
     {
         this.subscriptionRepository=subscriptionRepository;
         this.billingservice=billingservice;
         this.planRepository=planRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     public SubscriptionResponseDTO createSubscription(SubscriptionDTO dto)
@@ -106,7 +110,14 @@ public class SubscriptionService {
     public InvoiceDTO retrySubscription(Long id)
     {
         Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()->new RuntimeException("Subscription not found !"));
-        if(subscription.getStatus()!=SubscriptionStatus.PAST_DUE)
+
+        Invoice latest_invoice=invoiceRepository.findTopBySubscriptionIdOrderByIdDesc(id).orElseThrow(()->new RuntimeException("No invoice found for this subscription"));
+
+        if(latest_invoice.getStatus()== InvoiceStatus.PAID)
+        {
+            throw new RuntimeException("Invoice already paid for current billing cycle");
+        }
+        else if(subscription.getStatus()!=SubscriptionStatus.PAST_DUE)
         {
             return billingservice.processSubscription(subscription);
         }
