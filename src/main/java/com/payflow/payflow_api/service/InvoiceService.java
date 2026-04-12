@@ -62,9 +62,13 @@ public class InvoiceService {
         // create and return the InvoicePayableDTO
 
         // Get the corresponding INVOICE based payment mode invoice
-        Double invoice_amount = invoiceRepository.findAmountById(invoiceId).orElseThrow(()->new RuntimeException("Invoice amount not found !"));
 
-        Long subscription_id=invoiceRepository.findSubscriptionIdById(invoiceId).orElseThrow(()->new RuntimeException("Subscription id not found !"));
+        Invoice invoice=invoiceRepository.findById(invoiceId).orElseThrow(()->new RuntimeException("invoice not found"));
+
+
+        Double invoice_amount = invoice.getAmount();
+
+        Long subscription_id=invoice.getSubscriptionId();
 
         Subscription subscription =subscriptionRepository.findById(subscription_id).orElseThrow(()->new RuntimeException("Subscription not found !"));
 
