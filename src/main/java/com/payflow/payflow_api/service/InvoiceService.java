@@ -76,7 +76,7 @@ public class InvoiceService {
 
         Customer customer=customerRepository.findById(customer_id).orElseThrow(()->new RuntimeException("Customer not found !"));
 
-        Double creditBalance=customer.getCreditBalance();
+        Double creditBalance=customer.getCreditBalance()==null?0.0:customer.getCreditBalance();
 
         Double final_payable=Math.max(invoice_amount-creditBalance,0);
 
