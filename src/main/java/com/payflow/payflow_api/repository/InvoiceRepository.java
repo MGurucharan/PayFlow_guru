@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface InvoiceRepository extends JpaRepository<Invoice,Long> {
     Optional<Invoice> findTopBySubscriptionIdOrderByIdDesc(Long subscriptionId);
+    Optional<Double> findAmountById(Long invoiceId);
+    Optional <Long> findSubscriptionIdById(Long invoiceId);
 }

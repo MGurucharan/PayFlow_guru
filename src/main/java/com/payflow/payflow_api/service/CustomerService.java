@@ -23,6 +23,7 @@ public class CustomerService {
         Customer customer=new Customer();
         customer.setName(dto.name());
         customer.setEmail(dto.email());
+        customer.setCreditBalance(0.0);
 
         Customer savedCustomer=customerRepository.save(customer);
 

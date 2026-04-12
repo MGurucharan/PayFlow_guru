@@ -4,6 +4,7 @@ package com.payflow.payflow_api.controller;
 import com.payflow.payflow_api.dto.CreateInvoiceDTO;
 import com.payflow.payflow_api.dto.CustomerDTO;
 import com.payflow.payflow_api.dto.InvoiceDTO;
+import com.payflow.payflow_api.dto.InvoicePayableDTO;
 import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.service.InvoiceService;
 import jakarta.validation.Valid;
@@ -41,6 +42,12 @@ public class InvoiceController {
     public InvoiceDTO getInvoiceById(@Valid @PathVariable Long id)
     {
         return invoiceService.getInvoiceById(id);
+    }
+
+    @GetMapping("/{invoiceId}/payable")
+    public InvoicePayableDTO getPayableInvoice(@Valid @PathVariable Long invoiceId)
+    {
+        return invoiceService.getPayableInvoice(invoiceId);
     }
 
     @DeleteMapping("/{id}")

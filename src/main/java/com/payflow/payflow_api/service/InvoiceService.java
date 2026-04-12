@@ -3,13 +3,16 @@ package com.payflow.payflow_api.service;
 import com.payflow.payflow_api.dto.CreateInvoiceDTO;
 import com.payflow.payflow_api.dto.CustomerDTO;
 import com.payflow.payflow_api.dto.InvoiceDTO;
+import com.payflow.payflow_api.dto.InvoicePayableDTO;
 import com.payflow.payflow_api.entity.Customer;
 import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Subscription;
 import com.payflow.payflow_api.enums.InvoiceStatus;
+import com.payflow.payflow_api.repository.CustomerRepository;
 import com.payflow.payflow_api.repository.InvoiceRepository;
 import com.payflow.payflow_api.repository.SubscriptionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,11 +23,13 @@ import java.util.stream.Collectors;
 public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final CustomerRepository customerRepository;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, SubscriptionRepository subscriptionRepository)
+    public InvoiceService(InvoiceRepository invoiceRepository, SubscriptionRepository subscriptionRepository, CustomerRepository customerRepository)
     {
         this.invoiceRepository=invoiceRepository;
         this.subscriptionRepository=subscriptionRepository;
+        this.customerRepository = customerRepository;
     }
 
     // Create an Invoice
@@ -38,8 +43,8 @@ public class InvoiceService {
         invoice.setDueDate(LocalDate.now().plusDays(15));
         invoice.setStatus(status);
 
-        Invoice sinvoice=invoiceRepository.save(invoice);
-        return convertToDTO(sinvoice);
+        Invoice saved_invoice=invoiceRepository.save(invoice);
+        return convertToDTO(saved_invoice);
     }
 
     public List<InvoiceDTO> getInvoices()
@@ -47,6 +52,32 @@ public class InvoiceService {
         return invoiceRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public InvoicePayableDTO getPayableInvoice(Long invoiceId)
+    {
+        // get the corresponding invoice amount
+        // get the creditBalance of the customer using the invoiceId ( invoiceId -> Invoice -> subscriptionId -> subscription -> customerId -> custoemr -> CreditBalance )
+        // calc the finalPayable = max(invoiceAmount - customer.creditBalance, 0)
+        // create and return the InvoicePayableDTO
+
+        // Get the corresponding INVOICE based payment mode invoice
+        Double invoice_amount = invoiceRepository.findAmountById(invoiceId).orElseThrow(()->new RuntimeException("Invoice amount not found !"));
+
+        Long subscription_id=invoiceRepository.findSubscriptionIdById(invoiceId).orElseThrow(()->new RuntimeException("Subscription id not found !"));
+
+        Subscription subscription =subscriptionRepository.findById(subscription_id).orElseThrow(()->new RuntimeException("Subscription not found !"));
+
+        Long customer_id=subscription.getCustomerId();
+
+        Customer customer=customerRepository.findById(customer_id).orElseThrow(()->new RuntimeException("Customer not found !"));
+
+        Double creditBalance=customer.getCreditBalance();
+
+        Double final_payable=Math.max(invoice_amount-creditBalance,0);
+
+        return new InvoicePayableDTO(invoice_amount,creditBalance,final_payable);
+
     }
 
     public InvoiceDTO getInvoiceById(Long id)

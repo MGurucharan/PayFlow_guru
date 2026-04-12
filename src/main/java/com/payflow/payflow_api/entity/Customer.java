@@ -35,6 +35,16 @@ public class Customer{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Double creditBalance;
+
+    public Double getCreditBalance() {
+        return creditBalance;
+    }
+
+    public void setCreditBalance(Double creditBalance) {
+        this.creditBalance = creditBalance;
+    }
+
     private String name;
 
     private String email;
