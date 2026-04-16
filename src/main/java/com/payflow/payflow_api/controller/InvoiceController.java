@@ -55,9 +55,9 @@ public class InvoiceController {
     }
 
     @PostMapping("/{invoiceId}/pay")
-    public InvoicePaidDTO payInvoice(@Valid @PathVariable Long invoiceId, @RequestBody Double amountPaid, @RequestBody Boolean useWallet)
+    public InvoicePaidResponseDTO payInvoice(@RequestBody PayInvoiceDTO payInvoiceDTO)
     {
-        return paymentSettlementService.payInvoice(invoiceId,amountPaid,useWallet);
+        return paymentSettlementService.payInvoice(payInvoiceDTO.invoiceId(),payInvoiceDTO.amountPaid(),payInvoiceDTO.useWallet());
     }
 
 

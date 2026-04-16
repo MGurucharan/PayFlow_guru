@@ -1,6 +1,6 @@
 package com.payflow.payflow_api.service;
 
-import com.payflow.payflow_api.dto.InvoicePaidDTO;
+import com.payflow.payflow_api.dto.InvoicePaidResponseDTO;
 import com.payflow.payflow_api.entity.Customer;
 import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Subscription;
@@ -22,7 +22,7 @@ public class PaymentSettlementService {
         this.subscriptionRepository=subscriptionRepository;
     }
 
-    public InvoicePaidDTO payInvoice(Long invoiceId, Double amountPaid, Boolean useWallet)
+    public InvoicePaidResponseDTO payInvoice(Long invoiceId, Double amountPaid, Boolean useWallet)
     {
         Invoice invoice=invoiceRepository.findById(invoiceId).orElseThrow(()->new RuntimeException("Invoice not found"));
 
@@ -139,7 +139,7 @@ public class PaymentSettlementService {
 //            customerRepository.save(customer);
 //        }
 
-        return new InvoicePaidDTO(creditBalance,invoiceAmount,invoice.getStatus(),amountPaid,dueAmount);
+        return new InvoicePaidResponseDTO(creditBalance,invoiceAmount,invoice.getStatus(),amountPaid,dueAmount);
     }
 
 
