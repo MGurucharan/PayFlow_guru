@@ -1,28 +1,25 @@
 package com.payflow.payflow_api.controller;
 
 
-import com.payflow.payflow_api.dto.CreateInvoiceDTO;
-import com.payflow.payflow_api.dto.CustomerDTO;
-import com.payflow.payflow_api.dto.InvoiceDTO;
-import com.payflow.payflow_api.dto.InvoicePayableDTO;
-import com.payflow.payflow_api.entity.Invoice;
+import com.payflow.payflow_api.dto.*;
 import com.payflow.payflow_api.service.InvoiceService;
+import com.payflow.payflow_api.service.PaymentSettlementService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/invoices")
 public class InvoiceController {
     private final InvoiceService invoiceService;
+    private final PaymentSettlementService paymentSettlementService;
 
-    public InvoiceController(InvoiceService invoiceService)
+    public InvoiceController(InvoiceService invoiceService, PaymentSettlementService paymentSettlementService)
     {
         this.invoiceService=invoiceService;
+        this.paymentSettlementService=paymentSettlementService;
     }
 
 
@@ -48,7 +45,28 @@ public class InvoiceController {
     public InvoicePayableDTO getPayableInvoice(@Valid @PathVariable Long invoiceId)
     {
         return invoiceService.getPayableInvoice(invoiceId);
+
+        // Currently what shown :
+        // Invoice amount
+        // Credit Balance
+        // netPayable ( Invoice - Credit Balance ) // Already you are including the CreditBalance
+        // CHANGED to : Payable ( Invoice amount ONLY)
+
     }
+
+    @PostMapping("/{invoiceId}/pay")
+    public InvoicePaidDTO payInvoice(@Valid @PathVariable Long invoiceId, @RequestBody Double amountPaid, @RequestBody Boolean useWallet)
+    {
+        return paymentSettlementService.payInvoice(invoiceId,amountPaid,useWallet);
+    }
+
+
+    // What all to show once a customer has paid ?
+    // Credit Balance : x
+    // Invoice amount : z
+    // Invoice Status : PENDING/PAID
+    // Amount Paid : y
+    // Due Amount : w
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInvoice(@Valid @PathVariable Long id)

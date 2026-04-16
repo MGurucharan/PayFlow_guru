@@ -78,9 +78,10 @@ public class InvoiceService {
 
         Double creditBalance=customer.getCreditBalance()==null?0.0:customer.getCreditBalance();
 
-        Double final_payable=Math.max(invoice_amount-creditBalance,0);
+//      Double final_payable=Math.max(invoice_amount-creditBalance,0);
 
-        return new InvoicePayableDTO(invoice_amount,creditBalance,final_payable);
+
+        return new InvoicePayableDTO(invoice_amount,creditBalance,invoice_amount);
 
     }
 
