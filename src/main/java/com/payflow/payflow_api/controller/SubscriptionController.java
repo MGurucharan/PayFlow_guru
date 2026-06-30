@@ -61,4 +61,7 @@ public class SubscriptionController {
     {
         return subscriptionService.retrySubscription(id);
     }
+
+//    @PostMapping("/{id}/invoice") // Generates next billing cycle invoice
+//    public
 }

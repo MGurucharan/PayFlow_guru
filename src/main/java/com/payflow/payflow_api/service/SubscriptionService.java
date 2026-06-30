@@ -60,9 +60,9 @@ public class SubscriptionService {
 
         Subscription saved =  subscriptionRepository.save(subscription);
 
-        // Pass the saved subscription to BillingService
+        // Pass the saved subscription to BILLINGSERVICE
 
-        InvoiceDTO invoiceDTO = billingservice.processSubscription(saved);
+        InvoiceDTO invoiceDTO = billingservice.processSubscription(saved,false);// billingservice -> invoiceservice -> subscription service
 
         return new SubscriptionResponseDTO(convertToDTO(saved),invoiceDTO);
     }
@@ -107,6 +107,8 @@ public class SubscriptionService {
         return new SubscriptionDTO(subscription.getId(), subscription.getCustomerId(),subscription.getPlanId(),subscription.getBillingMode(),subscription.getPerc());
     }
 
+
+    // AUTO PAYMENTS RETRY
     public InvoiceDTO retrySubscription(Long id)
     {
         Subscription subscription=subscriptionRepository.findById(id).orElseThrow(()->new RuntimeException("Subscription not found !"));
@@ -120,7 +122,7 @@ public class SubscriptionService {
         }
         else if(subscription.getStatus()!=SubscriptionStatus.PAST_DUE)
         {
-            return billingservice.processSubscription(subscription);
+            return billingservice.processSubscription(subscription,true);
         }
         else
         {

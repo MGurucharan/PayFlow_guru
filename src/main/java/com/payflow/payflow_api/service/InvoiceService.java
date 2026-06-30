@@ -32,7 +32,7 @@ public class InvoiceService {
         this.customerRepository = customerRepository;
     }
 
-    // Create an Invoice
+    // Create an Invoice Once Billing is performed by BillingService
 
     public InvoiceDTO createInvoice(CreateInvoiceDTO dto,InvoiceStatus status)
     {
@@ -78,10 +78,10 @@ public class InvoiceService {
 
         Double creditBalance=customer.getCreditBalance()==null?0.0:customer.getCreditBalance();
 
-//      Double final_payable=Math.max(invoice_amount-creditBalance,0);
+      Double final_payable=Math.max(invoice_amount-creditBalance,0);
 
 
-        return new InvoicePayableDTO(invoice_amount,creditBalance,invoice_amount);
+        return new InvoicePayableDTO(invoice_amount,creditBalance,final_payable);
 
     }
 
@@ -102,6 +102,14 @@ public class InvoiceService {
         Invoice updatedInvoice=invoiceRepository.save(invoice);
 
         return convertToDTO(updatedInvoice);
+    }
+
+    public InvoiceDTO updateInvoiceStatus(Long subsid,InvoiceStatus status)
+    {
+        Invoice latest_Invoice =  invoiceRepository.findTopBySubscriptionIdOrderByIdDesc(subsid).orElseThrow(()->new RuntimeException("Invoice not found for the subscription ID !"));
+        latest_Invoice.setStatus(status);
+        invoiceRepository.save(latest_Invoice);
+        return convertToDTO(latest_Invoice);
     }
 
     public void deleteInvoice(Long id)

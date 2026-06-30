@@ -20,10 +20,10 @@ public class CustomerService {
 
     public CustomerDTO createCustomer(CustomerDTO dto)
     {
-        Customer customer=new Customer();
+        Customer customer=new Customer(); // new Customer Entity
         customer.setName(dto.name());
         customer.setEmail(dto.email());
-        customer.setCreditBalance(0.0);
+        customer.setCreditBalance(0.0); // Will be used for OverPayment Handling !
 
         Customer savedCustomer=customerRepository.save(customer);
 

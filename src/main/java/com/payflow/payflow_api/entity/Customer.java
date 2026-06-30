@@ -35,6 +35,8 @@ public class Customer{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // OverPayment Features
+
     private Double creditBalance;
 
     public Double getCreditBalance() {
@@ -44,6 +46,7 @@ public class Customer{
     public void setCreditBalance(Double creditBalance) {
         this.creditBalance = creditBalance;
     }
+
 
     private String name;
 

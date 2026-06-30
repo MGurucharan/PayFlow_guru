@@ -44,7 +44,7 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
 
-    private Double perc;
+    private Double perc; // Simulating AUTO Payment
 
     public Double getPerc() {
         return perc;
