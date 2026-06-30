@@ -45,6 +45,13 @@ public class BillingService {
             subscription.setPerc(perc);
             if((perc)>=0.70) // Successs !!!
             {
+                if(isRetry)
+                {
+                    Integer currentRetryCount=subscription.getRetryCount();
+                    // Performing the Retry so increment the retryCount by 1
+                    subscription.setRetryCount(currentRetryCount+1);
+                }
+
                 status=InvoiceStatus.PAID;
                 subscription.setStatus(SubscriptionStatus.ACTIVE); // Subscription still active !!!
                 subscription.setRetryCount(0); // previous retryCount is reset to 0 for next billing cycle
@@ -61,7 +68,6 @@ public class BillingService {
                 {
                     subscription.setRetryCount(currentRetryCount+1);
                 }
-
 
                 // Check if it has exceeded the maxRetryCount
                 if(subscription.getRetryCount()>=subscription.getMaxRetryCount())
