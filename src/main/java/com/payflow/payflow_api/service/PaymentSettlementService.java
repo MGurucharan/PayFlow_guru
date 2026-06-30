@@ -88,6 +88,7 @@ public class PaymentSettlementService {
                 dueAmount = invoiceAmount - (totalavailable);
                 creditBalance = 0.0;
                 invoice.setStatus(InvoiceStatus.PENDING);
+                invoice.setDueAmount(dueAmount);
                 customer.setCreditBalance(creditBalance);
             }
         }
@@ -113,6 +114,7 @@ public class PaymentSettlementService {
             {
                 // Since he doesn't want to use his wallet so don't consider CreditBalance
                 dueAmount = invoiceAmount-amountPaying;
+                invoice.setDueAmount(dueAmount);
                 invoice.setStatus(InvoiceStatus.PENDING);
             }
         }
