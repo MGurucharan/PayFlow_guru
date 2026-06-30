@@ -61,6 +61,7 @@ public class PaymentSettlementService {
                 creditBalance=creditBalance-invoiceAmount;
                 amountPaying=0.0;
                 invoice.setStatus(InvoiceStatus.PAID);
+                invoice.setDueAmount(invoiceAmount);
                 customer.setCreditBalance(creditBalance);
             }
             // Case - 2 ( Exact payment ) :
@@ -69,6 +70,7 @@ public class PaymentSettlementService {
             else if(totalavailable.equals(invoiceAmount)) {
                 creditBalance = 0.0; // remains as x only
                 invoice.setStatus(InvoiceStatus.PAID);
+                invoice.setDueAmount(0.0);
                 customer.setCreditBalance(creditBalance);
             }
 
@@ -78,6 +80,7 @@ public class PaymentSettlementService {
                 extra = totalavailable- invoiceAmount;
                 creditBalance = extra; // remains as x only
                 invoice.setStatus(InvoiceStatus.PAID);
+                invoice.setDueAmount(0.0);
                 customer.setCreditBalance(creditBalance);
             }
 
@@ -99,6 +102,7 @@ public class PaymentSettlementService {
             if(amountPaying.equals(invoiceAmount))
             {
                 invoice.setStatus(InvoiceStatus.PAID);
+                invoice.setDueAmount(0.0);
             }
 
             // CASE - 2 OVERPAYMENT :
@@ -107,6 +111,7 @@ public class PaymentSettlementService {
                 extra=amountPaying-invoiceAmount;
                 creditBalance=creditBalance+extra;
                 invoice.setStatus(InvoiceStatus.PAID);
+                invoice.setDueAmount(0.0);
                 customer.setCreditBalance(creditBalance);
             }
 
