@@ -38,6 +38,7 @@ public class InvoiceService {
     {
         Invoice invoice=new Invoice();
         invoice.setAmount(dto.amount());
+        invoice.setDueAmount(0.0);
         invoice.setSubscriptionId(dto.subscriptionId());
         invoice.setIssueDate(LocalDate.now());
         invoice.setDueDate(LocalDate.now().plusDays(15));
@@ -57,16 +58,18 @@ public class InvoiceService {
     public InvoicePayableDTO getPayableInvoice(Long invoiceId)
     {
         // get the corresponding invoice amount
-        // get the creditBalance of the customer using the invoiceId ( invoiceId -> Invoice -> subscriptionId -> subscription -> customerId -> custoemr -> CreditBalance )
+        // get the creditBalance of the customer using the invoiceId ( invoiceId -> Invoice -> subscriptionId -> subscription -> customerId -> customer -> CreditBalance )
         // calc the finalPayable = max(invoiceAmount - customer.creditBalance, 0)
         // create and return the InvoicePayableDTO
 
         // Get the corresponding INVOICE based payment mode invoice
 
+        // Get the Invoice from the InvoiceId
         Invoice invoice=invoiceRepository.findById(invoiceId).orElseThrow(()->new RuntimeException("invoice not found"));
 
 
         Double invoice_amount = invoice.getAmount();
+
 
         Long subscription_id=invoice.getSubscriptionId();
 
@@ -76,12 +79,13 @@ public class InvoiceService {
 
         Customer customer=customerRepository.findById(customer_id).orElseThrow(()->new RuntimeException("Customer not found !"));
 
-        Double creditBalance=customer.getCreditBalance()==null?0.0:customer.getCreditBalance();
+        Double creditBalance=customer.getCreditBalance();
 
-      Double final_payable=Math.max(invoice_amount-creditBalance,0);
+        Double final_payable=Math.max(invoice_amount-creditBalance,0);
 
+        Double dueAmount=invoice.getDueAmount();
 
-        return new InvoicePayableDTO(invoice_amount,creditBalance,final_payable);
+        return new InvoicePayableDTO(invoice_amount,creditBalance,dueAmount,final_payable);
 
     }
 

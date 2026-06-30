@@ -22,7 +22,7 @@ public class PaymentSettlementService {
         this.subscriptionRepository=subscriptionRepository;
     }
 
-    public InvoicePaidResponseDTO payInvoice(Long invoiceId, Double amountPaid, Boolean useWallet)
+    public InvoicePaidResponseDTO payInvoice(Long invoiceId, Double amountPaying, Boolean useWallet)
     {
         Invoice invoice=invoiceRepository.findById(invoiceId).orElseThrow(()->new RuntimeException("Invoice not found"));
 
@@ -42,7 +42,7 @@ public class PaymentSettlementService {
         // Perform the payment BASED ON useWallet or not
 
         Double extra=0.0;
-        Double dueAmount=0.0;
+        Double dueAmount=invoice.getDueAmount();
 
         InvoiceStatus invoiceStatus=invoice.getStatus();
 
@@ -54,12 +54,12 @@ public class PaymentSettlementService {
         // USEWALLET = YES
         if(useWallet)
         {
-            Double totalavailable = amountPaid+creditBalance; // y + x
+            Double totalavailable = amountPaying+creditBalance; // y + x
             // Case - 1 ( Credit Balance handles everything ) :
             if(creditBalance>=invoiceAmount) // If he wants to use CreditBalance then check if CreditBalance can suffice everything
             {
                 creditBalance=creditBalance-invoiceAmount;
-                amountPaid=0.0;
+                amountPaying=0.0;
                 invoice.setStatus(InvoiceStatus.PAID);
                 customer.setCreditBalance(creditBalance);
             }
@@ -95,24 +95,24 @@ public class PaymentSettlementService {
         else
         {
             // CASE - 1 EXACT PAYMENT :
-            if(amountPaid.equals(invoiceAmount))
+            if(amountPaying.equals(invoiceAmount))
             {
                 invoice.setStatus(InvoiceStatus.PAID);
             }
 
             // CASE - 2 OVERPAYMENT :
-            else if(amountPaid >  invoiceAmount)
+            else if(amountPaying >  invoiceAmount)
             {
-                extra=amountPaid-invoiceAmount;
+                extra=amountPaying-invoiceAmount;
                 creditBalance=creditBalance+extra;
                 invoice.setStatus(InvoiceStatus.PAID);
                 customer.setCreditBalance(creditBalance);
             }
 
-            else if(amountPaid <  invoiceAmount)
+            else if(amountPaying <  invoiceAmount)
             {
                 // Since he doesn't want to use his wallet so don't consider CreditBalance
-                dueAmount = invoiceAmount-amountPaid;
+                dueAmount = invoiceAmount-amountPaying;
                 invoice.setStatus(InvoiceStatus.PENDING);
             }
         }
@@ -139,7 +139,7 @@ public class PaymentSettlementService {
 //            customerRepository.save(customer);
 //        }
 
-        return new InvoicePaidResponseDTO(creditBalance,invoiceAmount,invoice.getStatus(),amountPaid,dueAmount);
+        return new InvoicePaidResponseDTO(creditBalance,invoiceAmount,invoice.getStatus(),amountPaying,dueAmount);
     }
 
 

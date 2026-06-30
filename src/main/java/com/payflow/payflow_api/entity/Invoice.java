@@ -14,6 +14,16 @@ public class Invoice {
 
     private Long subscriptionId;
 
+    public Double getDueAmount() {
+        return DueAmount;
+    }
+
+    public void setDueAmount(Double dueAmount) {
+        DueAmount = dueAmount;
+    }
+
+    private Double DueAmount;
+
     private Double amount;
 
     public Long getId() {
