@@ -5,14 +5,19 @@ import com.payflow.payflow_api.dto.PaymentMethodDTO;
 import com.payflow.payflow_api.dto.SetupIntentDTO;
 import com.payflow.payflow_api.entity.Customer;
 import com.payflow.payflow_api.repository.CustomerRepository;
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.SetupIntent;
 import com.stripe.param.SetupIntentCreateParams;
 import com.stripe.param.CustomerCreateParams;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StripeCustomerService {
+
+    @Value("${stripe.secret.key}")
+    private String stripeSecretKey;
 
     private final CustomerRepository customerRepository;
 
@@ -20,7 +25,10 @@ public class StripeCustomerService {
         this.customerRepository = customerRepository;
     }
 
+
     public void createStripeCustomer(Customer customer) {
+
+        Stripe.apiKey = stripeSecretKey;
         CustomerCreateParams params =
                 CustomerCreateParams.builder()
                         .setName(customer.getName())
@@ -44,6 +52,7 @@ public class StripeCustomerService {
     // returns client-secret to the react frontend
     public SetupIntentDTO createSetupIntent(Long customerId)
     {
+        Stripe.apiKey = stripeSecretKey;
         Customer customer =
                 customerRepository.findById(customerId)
                         .orElseThrow(() ->
@@ -73,6 +82,7 @@ public class StripeCustomerService {
 
     public void savePaymentMethod(PaymentMethodDTO paymentMethodDTO)
     {
+        Stripe.apiKey = stripeSecretKey;
         Customer customer =
                 customerRepository.findById(paymentMethodDTO.customerId())
                         .orElseThrow(() ->
