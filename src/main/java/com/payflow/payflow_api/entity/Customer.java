@@ -27,6 +27,26 @@ public class Customer{
         return email;
     }
 
+    private String stripeCustomerId;
+
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
+    }
+
+    public String getStripePaymentMethodId() {
+        return stripePaymentMethodId;
+    }
+
+    public void setStripePaymentMethodId(String stripePaymentMethodId) {
+        this.stripePaymentMethodId = stripePaymentMethodId;
+    }
+
+    private String stripePaymentMethodId;
+
     public void setEmail(String email) {
         this.email = email;
     }

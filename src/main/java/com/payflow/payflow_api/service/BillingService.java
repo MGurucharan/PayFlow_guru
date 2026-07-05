@@ -3,6 +3,7 @@ import java.util.Random;
 
 import com.payflow.payflow_api.dto.CreateInvoiceDTO;
 import com.payflow.payflow_api.dto.InvoiceDTO;
+import com.payflow.payflow_api.dto.PaymentResultDTO;
 import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Plan;
 import com.payflow.payflow_api.entity.Subscription;
@@ -20,12 +21,14 @@ public class BillingService {
     private final PlanRepository planRepository;
     private final InvoiceService invoiceService;
     private final SubscriptionRepository subscriptionRepository;
+    private final StripePaymentService stripePaymentService;
 
 
-    public BillingService(PlanRepository planRepository, InvoiceService invoiceService, SubscriptionRepository subscriptionRepository) {
+    public BillingService(PlanRepository planRepository, InvoiceService invoiceService, SubscriptionRepository subscriptionRepository, StripePaymentService stripePaymentService) {
         this.planRepository = planRepository;
         this.invoiceService=invoiceService;
         this.subscriptionRepository = subscriptionRepository;
+        this.stripePaymentService = stripePaymentService;
     }
 
 
@@ -36,67 +39,124 @@ public class BillingService {
 
         Plan plan=planRepository.findById(subscription.getPlanId()).orElseThrow(()->new RuntimeException("Plan not found"));
 
-        InvoiceStatus status;
-        Random random = new Random();
+        InvoiceStatus status = InvoiceStatus.PENDING;
+
+        /*
+        Implement Razor Pay in BillingService itself !
+
+        Flow
+
+        Get the Subscription
+        |
+        Get the corresponding Plan
+        |
+        Initialize the Invoice status to PENDING ( depends on the RazorPay Success or Failure )
+        |
+        AUTO
+        |
+        Use StripePayment Auto recurring services
+        |
+        Retrieve Stored Payment Method
+        |
+        Create PaymentIntent
+        |
+        Charge the customer Automatically
+        |
+        Create/Update the invoice based on Success/Failed
+        |
+        MANUAL
+        |
+        Use RazorPay Payment Gateway
+        |
+        Create the order request
+        |
+        Return the order req to React
+        |
+        Customer sees a payment UI
+        |
+        Performs the payment by manually entering the payment details
+        |
+        Based on success/failure
+        |
+        Create the invoice based on Success/Failed
+
+         */
         if(subscription.getBillingMode()== BillingMode.AUTO)
         {
-            //Simulating the PAYMENT
-            double perc=random.nextDouble(); // 0.54 , 0.23434 // RAZORPAY
-            subscription.setPerc(perc);
-            if((perc)>=0.70) // Successs !!!
-            {
-                if(isRetry)
-                {
-                    Integer currentRetryCount=subscription.getRetryCount();
-                    // Performing the Retry so increment the retryCount by 1
-                    subscription.setRetryCount(currentRetryCount+1);
-                }
+            /*
+                AUTO
+                |
+                Use StripePayment Auto recurring services
+                |
+                Retrieve Stored Payment Method
+                |
+                Create PaymentIntent
+                |
+                Charge the customer Automatically
+                |
+                Create/Update the invoice based on Success/Failed
+                |
+             */
 
+            PaymentResultDTO paymentResultDTO=stripePaymentService.chargeCustomer(subscription,plan.getPrice());
+
+            if(paymentResultDTO.success())
+            {
                 status=InvoiceStatus.PAID;
-                subscription.setStatus(SubscriptionStatus.ACTIVE); // Subscription still active !!!
-                subscription.setRetryCount(0); // previous retryCount is reset to 0 for next billing cycle
+                subscription.setRetryCount(0);
+                subscription.setStatus(SubscriptionStatus.ACTIVE);
             }
-            else // Failed !!! can retry
+            else
             {
                 status=InvoiceStatus.FAILED;
-
-                // Retry Logic over here ?
-                Integer currentRetryCount=subscription.getRetryCount();
-
-                // Performing the Retry so increment the retryCount by 1
                 if(isRetry)
                 {
-                    subscription.setRetryCount(currentRetryCount+1);
+                    subscription.setRetryCount(
+                            subscription.getRetryCount()+1);
                 }
 
-                // Check if it has exceeded the maxRetryCount
-                if(subscription.getRetryCount()>=subscription.getMaxRetryCount())
+                if(subscription.getRetryCount() >=
+                        subscription.getMaxRetryCount())
                 {
-                    subscription.setStatus(SubscriptionStatus.PAST_DUE); // Maybe Change it to CANCELLED when RetryCount exceeded ?
-                }
-                else
-                {
-                    subscription.setStatus(SubscriptionStatus.ACTIVE);
+                    subscription.setStatus(
+                            SubscriptionStatus.PAST_DUE);
                 }
             }
-            subscriptionRepository.save(subscription);
         }
         else
         {
+            /*
+            MANUAL
+            |
+            Use RazorPay Payment Gateway
+            |
+            Create the order request
+            |
+            Return the order req to React
+            |
+            Customer sees a payment UI
+            |
+            Performs the payment by manually entering the payment details
+            |
+            Based on success/failure
+            |
+            Create the invoice based on Success/Failed
+             */
+
             status=InvoiceStatus.PENDING;
         }
 
-        if(!isRetry)
-        {
-            CreateInvoiceDTO cinvoiceDTO=new CreateInvoiceDTO(subscription.getId(),plan.getPrice());
-
-            return invoiceService.createInvoice(cinvoiceDTO,status);
-        }
-        else
-        {
-            // GET THE OLD INVOICE AND UPDATE THE STATUS TO PAID
-            return invoiceService.updateInvoiceStatus(subscription.getId(),status);
-        }
+//        if(!isRetry)
+//        {
+//            CreateInvoiceDTO cinvoiceDTO=new CreateInvoiceDTO(subscription.getId(),plan.getPrice());
+//
+//            return invoiceService.createInvoice(cinvoiceDTO,status);
+//        }
+//        else
+//        {
+//            // GET THE OLD INVOICE AND UPDATE THE STATUS TO PAID
+//            return invoiceService.updateInvoiceStatus(subscription.getId(),status);
+//        }
 
     }
 

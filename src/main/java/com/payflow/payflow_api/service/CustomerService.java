@@ -12,10 +12,12 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final StripeCustomerService stripeCustomerService;
 
-    public CustomerService(CustomerRepository customerRepository)
+    public CustomerService(CustomerRepository customerRepository,StripeCustomerService stripeCustomerService)
     {
         this.customerRepository=customerRepository;
+        this.stripeCustomerService=stripeCustomerService;
     }
 
     public CustomerDTO createCustomer(CustomerDTO dto)
@@ -26,6 +28,8 @@ public class CustomerService {
         customer.setCreditBalance(0.0); // Will be used for OverPayment Handling !
 
         Customer savedCustomer=customerRepository.save(customer);
+
+        stripeCustomerService.createStripeCustomer(savedCustomer);
 
         return convertToDTO(savedCustomer);
     }
