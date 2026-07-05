@@ -30,6 +30,10 @@ public class StripePaymentService {
 
         String stripeCustomerId=customer.getStripeCustomerId();
         String stripePaymentMethodId=customer.getStripePaymentMethodId();
+
+        System.out.println("Stripe Secret Key = " + stripeSecretKey);
+        System.out.println("Is Null? " + (stripeSecretKey == null));
+
         Stripe.apiKey = stripeSecretKey;
 
         if (stripeCustomerId == null || stripePaymentMethodId == null) {
