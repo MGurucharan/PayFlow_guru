@@ -158,6 +158,8 @@ public class BillingService {
 //            return invoiceService.updateInvoiceStatus(subscription.getId(),status);
 //        }
 
+        return new InvoiceDTO(null,null,null,null,null,InvoiceStatus.PENDING);
+
     }
 
 
