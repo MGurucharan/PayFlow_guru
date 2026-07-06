@@ -1,4 +1,5 @@
 package com.payflow.payflow_api.service;
+import java.time.LocalDate;
 import java.util.Random;
 
 import com.payflow.payflow_api.dto.CreateInvoiceDTO;
@@ -99,6 +100,13 @@ public class BillingService {
              */
 
             PaymentResultDTO paymentResultDTO=stripePaymentService.chargeCustomer(subscription,plan.getPrice());
+            /*
+            public record PaymentResultDTO(boolean success,
+                                       String transactionId,
+                                       String failureReason) {
+            }
+
+             */
 
             if(paymentResultDTO.success())
             {
@@ -114,7 +122,6 @@ public class BillingService {
                     subscription.setRetryCount(
                             subscription.getRetryCount()+1);
                 }
-
                 if(subscription.getRetryCount() >=
                         subscription.getMaxRetryCount())
                 {
@@ -122,6 +129,7 @@ public class BillingService {
                             SubscriptionStatus.PAST_DUE);
                 }
             }
+            return new InvoiceDTO(null, subscription.getId(), plan.getPrice(), LocalDate.now(),LocalDate.now(),status);
         }
         else
         {

@@ -23,7 +23,7 @@ public class StripeController {
     @ResponseStatus(HttpStatus.CREATED)
     public SetupIntentDTO getClientSecret(@Valid @PathVariable Long customerId)
     {
-        return stripeCustomerService.createSetupIntent(customerId);
+        return stripeCustomerService.createSetupIntent(customerId); // returns the DTO that contains the ClientSecret Key
     }
 
     @PostMapping("/payment-method")

@@ -23,7 +23,7 @@ public class StripePaymentService {
         this.customerRepository = customerRepository;
     }
 
-    public PaymentResultDTO chargeCustomer(Subscription subscription, Double price)
+    public PaymentResultDTO chargeCustomer(Subscription subscription, Double price) // Creates the paymentIntent on the Saved Payment method and charges the customer
     {
 
         Customer customer = customerRepository.findById(subscription.getCustomerId()).orElseThrow(()->new RuntimeException("Customer not found"));
@@ -31,8 +31,6 @@ public class StripePaymentService {
         String stripeCustomerId=customer.getStripeCustomerId();
         String stripePaymentMethodId=customer.getStripePaymentMethodId();
 
-        System.out.println("Stripe Secret Key = " + stripeSecretKey);
-        System.out.println("Is Null? " + (stripeSecretKey == null));
 
         Stripe.apiKey = stripeSecretKey;
 
@@ -44,7 +42,7 @@ public class StripePaymentService {
             );
         }
 
-
+        // setting all the parameters required for PaymentIntent
         PaymentIntentCreateParams params =
                 PaymentIntentCreateParams.builder()
 
