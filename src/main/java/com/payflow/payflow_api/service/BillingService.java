@@ -108,6 +108,10 @@ public class BillingService {
 
              */
 
+            System.out.println(paymentResultDTO.success());
+            System.out.println(paymentResultDTO.failureReason());
+            System.out.println(paymentResultDTO.transactionId());
+
             if(paymentResultDTO.success())
             {
                 status=InvoiceStatus.PAID;
