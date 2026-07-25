@@ -42,7 +42,8 @@ public class RazorPayService {
         {
             RazorpayClient razorpay = new RazorpayClient(razorpayApiKey, razorpayApiSecret);
             JSONObject request = new JSONObject();
-            request.put("amount",plan.getPrice()*100);  // Razorpay expects amount in paise
+            long amountInPaise = Math.round(plan.getPrice() * 100);
+            request.put("amount",amountInPaise);  // Razorpay expects amount in paise
             request.put("currency", "INR");
 
             Order order = razorpay.orders.create(request); // creation of the order object with the required parameters
