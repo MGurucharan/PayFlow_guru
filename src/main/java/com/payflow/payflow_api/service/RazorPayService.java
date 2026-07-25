@@ -47,7 +47,11 @@ public class RazorPayService {
 
             Order order = razorpay.orders.create(request); // creation of the order object with the required parameters
 
-            return new RazorPayOrderDTO(order.get("id"),order.get("amount"),order.get("currency"),razorpayApiKey);
+            String orderId = order.get("id").toString();
+            Long amount = ((Number) order.get("amount")).longValue();
+            String currency = order.get("currency").toString();
+
+            return new RazorPayOrderDTO(orderId,amount,currency,razorpayApiKey);
         }
         catch (Exception e)
         {
