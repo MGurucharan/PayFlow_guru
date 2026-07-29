@@ -1,9 +1,7 @@
 package com.payflow.payflow_api.service;
 
 
-import com.payflow.payflow_api.dto.InvoiceDTO;
-import com.payflow.payflow_api.dto.SubscriptionDTO;
-import com.payflow.payflow_api.dto.SubscriptionResponseDTO;
+import com.payflow.payflow_api.dto.*;
 import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Plan;
 import com.payflow.payflow_api.entity.Subscription;
@@ -62,9 +60,9 @@ public class SubscriptionService {
 
         // Pass the saved subscription to BILLINGSERVICE
 
-        InvoiceDTO invoiceDTO = billingservice.processSubscription(saved,false);// billingservice -> invoiceservice -> subscription service
+        BillingResultDTO billingResultDTO=billingservice.processSubscription(saved);
 
-        return new SubscriptionResponseDTO(convertToDTO(saved),invoiceDTO);
+        return new SubscriptionResponseDTO(convertToDTO(saved),billingResultDTO.invoiceDTO(),billingResultDTO.razorPayOrderDTO());
     }
 
     public List<SubscriptionDTO> getSubscriptions()
@@ -122,7 +120,7 @@ public class SubscriptionService {
         }
         else if(subscription.getStatus()!=SubscriptionStatus.PAST_DUE)
         {
-            return billingservice.processSubscription(subscription,true);
+            return billingservice.processSubscription(subscription).invoiceDTO();
         }
         else
         {

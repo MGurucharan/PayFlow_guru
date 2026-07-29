@@ -4,6 +4,7 @@ package com.payflow.payflow_api.controller;
 import com.payflow.payflow_api.dto.*;
 import com.payflow.payflow_api.service.InvoiceService;
 import com.payflow.payflow_api.service.PaymentSettlementService;
+import com.payflow.payflow_api.service.RazorPayService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +16,13 @@ import java.util.List;
 public class InvoiceController {
     private final InvoiceService invoiceService;
     private final PaymentSettlementService paymentSettlementService;
+    private final RazorPayService razorPayService;
 
-    public InvoiceController(InvoiceService invoiceService, PaymentSettlementService paymentSettlementService)
+    public InvoiceController(InvoiceService invoiceService, PaymentSettlementService paymentSettlementService, RazorPayService razorPayService)
     {
         this.invoiceService=invoiceService;
         this.paymentSettlementService=paymentSettlementService;
+        this.razorPayService = razorPayService;
     }
 
 
@@ -58,6 +61,12 @@ public class InvoiceController {
     public InvoicePaidResponseDTO payInvoice(@RequestBody PayInvoiceDTO payInvoiceDTO)
     {
         return paymentSettlementService.payInvoice(payInvoiceDTO.invoiceId(),payInvoiceDTO.amountPaying(),payInvoiceDTO.useWallet());
+    }
+
+    @PostMapping("/{invoiceId}/razorpay-callback")
+    public InvoiceDTO VerifyPayment(@PathVariable Long invoiceId,@RequestBody RazorPayCallbackDTO razorPayCallbackDTO)
+    {
+        return razorPayService.verifyPayment(invoiceId,razorPayCallbackDTO);
     }
 
 

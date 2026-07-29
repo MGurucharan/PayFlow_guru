@@ -2,9 +2,7 @@ package com.payflow.payflow_api.service;
 import java.time.LocalDate;
 import java.util.Random;
 
-import com.payflow.payflow_api.dto.CreateInvoiceDTO;
-import com.payflow.payflow_api.dto.InvoiceDTO;
-import com.payflow.payflow_api.dto.PaymentResultDTO;
+import com.payflow.payflow_api.dto.*;
 import com.payflow.payflow_api.entity.Invoice;
 import com.payflow.payflow_api.entity.Plan;
 import com.payflow.payflow_api.entity.Subscription;
@@ -14,6 +12,7 @@ import com.payflow.payflow_api.enums.SubscriptionStatus;
 import com.payflow.payflow_api.repository.InvoiceRepository;
 import com.payflow.payflow_api.repository.PlanRepository;
 import com.payflow.payflow_api.repository.SubscriptionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,19 +22,21 @@ public class BillingService {
     private final InvoiceService invoiceService;
     private final SubscriptionRepository subscriptionRepository;
     private final StripePaymentService stripePaymentService;
+    private final RazorPayService razorPayService;
 
 
-    public BillingService(PlanRepository planRepository, InvoiceService invoiceService, SubscriptionRepository subscriptionRepository, StripePaymentService stripePaymentService) {
+    public BillingService(PlanRepository planRepository, InvoiceService invoiceService, SubscriptionRepository subscriptionRepository, StripePaymentService stripePaymentService,RazorPayService razorPayService) {
         this.planRepository = planRepository;
         this.invoiceService=invoiceService;
         this.subscriptionRepository = subscriptionRepository;
         this.stripePaymentService = stripePaymentService;
+        this.razorPayService=razorPayService;
     }
 
 
     // New Subscriptions/ Failed Subscriptions arrive :
     // Billing Service performs the billing at the time of payment
-    public InvoiceDTO processSubscription(Subscription subscription,boolean isRetry)
+    public BillingResultDTO processSubscription(Subscription subscription)
     {
 
         Plan plan=planRepository.findById(subscription.getPlanId()).orElseThrow(()->new RuntimeException("Plan not found"));
@@ -82,7 +83,7 @@ public class BillingService {
         Create the invoice based on Success/Failed
 
          */
-        if(subscription.getBillingMode()== BillingMode.AUTO)
+        if(subscription.getBillingMode()== BillingMode.AUTO) //Stripe's subscription
         {
             /*
                 AUTO
@@ -121,11 +122,8 @@ public class BillingService {
             else
             {
                 status=InvoiceStatus.FAILED;
-                if(isRetry)
-                {
-                    subscription.setRetryCount(
-                            subscription.getRetryCount()+1);
-                }
+                subscription.setRetryCount(
+                subscription.getRetryCount()+1);
                 if(subscription.getRetryCount() >=
                         subscription.getMaxRetryCount())
                 {
@@ -133,7 +131,8 @@ public class BillingService {
                             SubscriptionStatus.PAST_DUE);
                 }
             }
-            return new InvoiceDTO(null, subscription.getId(), plan.getPrice(), LocalDate.now(),LocalDate.now(),status);
+            InvoiceDTO invoiceDTO= invoiceService.createInvoice(new CreateInvoiceDTO(subscription.getId(),plan.getPrice()),status);
+            return new BillingResultDTO(new InvoiceDTO(invoiceDTO.id(), subscription.getId(), plan.getPrice(), LocalDate.now(),LocalDate.now(),status),null);
         }
         else
         {
@@ -155,23 +154,14 @@ public class BillingService {
             Create the invoice based on Success/Failed
              */
 
-            status=InvoiceStatus.PENDING;
+            InvoiceDTO invoiceDTO = invoiceService.createInvoice(new CreateInvoiceDTO(subscription.getId(),plan.getPrice()),InvoiceStatus.PENDING);
+
+            RazorPayOrderDTO razorPayOrderDTO=razorPayService.createOrder(subscription.getId());
+
+            return new BillingResultDTO(invoiceDTO, razorPayOrderDTO); // frontend response
+
+
         }
-
-//        if(!isRetry)
-//        {
-//            CreateInvoiceDTO cinvoiceDTO=new CreateInvoiceDTO(subscription.getId(),plan.getPrice());
-//
-//            return invoiceService.createInvoice(cinvoiceDTO,status);
-//        }
-//        else
-//        {
-//            // GET THE OLD INVOICE AND UPDATE THE STATUS TO PAID
-//            return invoiceService.updateInvoiceStatus(subscription.getId(),status);
-//        }
-
-        return new InvoiceDTO(null,null,null,null,null,InvoiceStatus.PENDING);
-
     }
 
 
