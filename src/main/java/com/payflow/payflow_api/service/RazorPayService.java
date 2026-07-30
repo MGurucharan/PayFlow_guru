@@ -76,6 +76,10 @@ public class RazorPayService {
         options.put("razorpay_payment_id", razorPayCallbackDTO.razorpayPaymentId());
         options.put("razorpay_signature", razorPayCallbackDTO.razorpaySignature());
 
+        System.out.println(razorPayCallbackDTO.razorpayOrderId());
+        System.out.println(razorPayCallbackDTO.razorpayPaymentId());
+        System.out.println(razorPayCallbackDTO.razorpaySignature());
+
         try {
            boolean isValid = Utils.verifyPaymentSignature(options,razorpayApiKey);
 
