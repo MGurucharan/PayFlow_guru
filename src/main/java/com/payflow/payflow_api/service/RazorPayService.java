@@ -60,7 +60,7 @@ public class RazorPayService {
             Long amount = ((Number) order.get("amount")).longValue();
             String currency = order.get("currency").toString();
 
-            return new RazorPayOrderDTO(orderId,amount,currency,razorpayApiSecret);
+            return new RazorPayOrderDTO(orderId,amount,currency,razorpayApiKey);
         }
         catch (Exception e)
         {
@@ -86,7 +86,7 @@ public class RazorPayService {
         System.out.println(razorPayCallbackDTO.razorpaySignature());
 
         try {
-           boolean isValid = Utils.verifyPaymentSignature(options,razorpayApiKey);
+           boolean isValid = Utils.verifyPaymentSignature(options,razorpayApiSecret);
 
            if(isValid)
            {
