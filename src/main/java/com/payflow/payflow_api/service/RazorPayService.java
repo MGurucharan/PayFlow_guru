@@ -60,7 +60,7 @@ public class RazorPayService {
             Long amount = ((Number) order.get("amount")).longValue();
             String currency = order.get("currency").toString();
 
-            return new RazorPayOrderDTO(orderId,amount,currency,razorpayApiKey);
+            return new RazorPayOrderDTO(orderId,amount,currency,razorpayApiSecret);
         }
         catch (Exception e)
         {
