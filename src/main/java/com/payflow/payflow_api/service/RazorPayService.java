@@ -16,10 +16,14 @@ import com.payflow.payflow_api.repository.SubscriptionRepository;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.Utils;
+import org.apache.commons.codec.binary.Hex;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Service
@@ -86,7 +90,22 @@ public class RazorPayService {
         System.out.println(razorPayCallbackDTO.razorpaySignature());
 
         try {
-           boolean isValid = Utils.verifyPaymentSignature(options,razorpayApiSecret);
+
+            Mac sha256_MAC=Mac.getInstance("HmacSHA256");
+
+            String payload=razorPayCallbackDTO.razorpayOrderId()+'|'+razorPayCallbackDTO.razorpayPaymentId();
+
+            SecretKeySpec secret_key=new SecretKeySpec(razorpayApiSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+
+            sha256_MAC.init(secret_key);
+
+            byte[] hash=sha256_MAC.doFinal(payload.getBytes());
+
+            String actual_signature= new String(Hex.encodeHex(hash));
+
+            String expected_signature=razorPayCallbackDTO.razorpaySignature();
+
+            boolean isValid=isEquals(actual_signature.getBytes(StandardCharsets.UTF_8),expected_signature.getBytes(StandardCharsets.UTF_8));
 
            if(isValid)
            {
@@ -106,5 +125,25 @@ public class RazorPayService {
         {
             throw new RuntimeException("Razorpay API Error: " + e.getMessage());
         }
+    }
+
+    public boolean isEquals(byte[] a, byte[] b)
+    {
+        if(a.length!=b.length)
+        {
+            return false;
+        }
+        else
+        {
+            int result=0;
+
+            for(int i=0;i<a.length;i++)
+            {
+                result=result | a[i]^b[i];
+            }
+            return result==0;
+        }
+
+
     }
 }
