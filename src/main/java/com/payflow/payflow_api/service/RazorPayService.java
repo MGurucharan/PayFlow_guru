@@ -71,6 +71,11 @@ public class RazorPayService {
 
     public InvoiceDTO verifyPayment(Long invoiceId, RazorPayCallbackDTO razorPayCallbackDTO)
     {
+        // Verification flow :
+
+        // use the razorpayPaymentId and the orderCreationId to create HMAC hex digest  ( hash value ) and compare it with the
+        // signature.
+
         JSONObject options=new JSONObject();
         options.put("razorpay_order_id", razorPayCallbackDTO.razorpayOrderId());
         options.put("razorpay_payment_id", razorPayCallbackDTO.razorpayPaymentId());
@@ -94,7 +99,7 @@ public class RazorPayService {
            }
            else
            {
-               throw new RuntimeException("Invalid signature");
+               throw new RuntimeException("Invalid signature because the signatures didnt match !");
            }
         }
         catch (Exception e)
