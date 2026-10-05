@@ -12,9 +12,7 @@ public record SubscriptionDTO(
         Long planId,
 
         @NotNull
-        BillingMode billingMode,
-
-        Double per
+        BillingMode billingMode
 )
 {
 }

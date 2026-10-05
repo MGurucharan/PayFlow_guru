@@ -102,7 +102,7 @@ public class SubscriptionService {
 
     public SubscriptionDTO convertToDTO(Subscription subscription)
     {
-        return new SubscriptionDTO(subscription.getId(), subscription.getCustomerId(),subscription.getPlanId(),subscription.getBillingMode(),subscription.getPerc());
+        return new SubscriptionDTO(subscription.getId(), subscription.getCustomerId(),subscription.getPlanId(),subscription.getBillingMode());
     }
 
 

@@ -59,6 +59,7 @@ public class StripeCustomerService {
                 customerRepository.findById(customerId)
                         .orElseThrow(() ->
                                 new RuntimeException("Customer not found"));
+
         if(customer.getStripeCustomerId()==null)
         {
             throw new RuntimeException(

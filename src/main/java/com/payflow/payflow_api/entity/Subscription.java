@@ -43,17 +43,6 @@ public class Subscription {
 
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus status;
-
-    private Double perc; // Simulating AUTO Payment
-
-    public Double getPerc() {
-        return perc;
-    }
-
-    public void setPerc(Double perc) {
-        this.perc = perc;
-    }
-
     private LocalDate startDate;
 
     public Long getId() {
@@ -80,6 +69,7 @@ public class Subscription {
     public void setPlanId(Long planId) {
         this.planId = planId;
     }
+
 
     public BillingMode getBillingMode() {
         return billingMode;

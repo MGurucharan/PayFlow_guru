@@ -99,7 +99,6 @@ public class BillingService {
                 Create/Update the invoice based on Success/Failed
                 |
              */
-
             PaymentResultDTO paymentResultDTO=stripePaymentService.chargeCustomer(subscription,plan.getPrice());
             /*
             public record PaymentResultDTO(boolean success,
